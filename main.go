@@ -9,7 +9,7 @@ func main() {
 	h := ProcessHandler{
 		calculator: calculator.New(
 			calculator.Config{
-				IterationCount:       2,
+				IterationCount:       6,
 				TransparencyTreshold: 10,
 			},
 		),

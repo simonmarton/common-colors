@@ -1,6 +1,7 @@
 package color
 
 import (
+	"fmt"
 	"image/color"
 	"math"
 )
@@ -65,28 +66,19 @@ func (c Color) Saturation() float64 {
 	return delta / (max + min)
 }
 
-/*
-function rgbToHsl(r, g, b) {
-  r /= 255, g /= 255, b /= 255;
-
-  var max = Math.max(r, g, b), min = Math.min(r, g, b);
-  var h, s, l = (max + min) / 2;
-
-  if (max == min) {
-    h = s = 0; // achromatic
-  } else {
-    var d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-
-    h /= 6;
-  }
-
-  return [ h, s, l ];
+// Average of two colors
+func (c Color) Average(c2 Color) Color {
+	sumWeight := c.Weight + c2.Weight
+	return Color{
+		R:      uint8((int(c.R)*c.Weight + int(c2.R)*c2.Weight) / sumWeight),
+		G:      uint8((int(c.G)*c.Weight + int(c2.G)*c2.Weight) / sumWeight),
+		B:      uint8((int(c.B)*c.Weight + int(c2.B)*c2.Weight) / sumWeight),
+		A:      uint8((int(c.A)*c.Weight + int(c2.A)*c2.Weight) / sumWeight),
+		Weight: sumWeight,
+	}
 }
-*/
+
+// ToHex return a hex color string
+func (c Color) ToHex() string {
+	return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
+}
