@@ -9,13 +9,19 @@ import (
 
 // CommonColorsResp format
 type CommonColorsResp struct {
-	Colors []string `json:"colors"`
+	Colors []ColorResp `json:"colors"`
+}
+
+// ColorResp ...
+type ColorResp struct {
+	Weight int    `json:"weight"`
+	Value  string `json:"value"`
 }
 
 // APIHandler interface
 type APIHandler interface {
 	// GetCommonColors(io.Reader) CommonColorsResp
-	ProcessImage(file io.Reader, imageType string) ([]string, error)
+	ProcessImage(file io.Reader, imageType string) (CommonColorsResp, error)
 }
 
 // Initialize a new web server
@@ -38,9 +44,7 @@ func Initialize(h APIHandler) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		resp, err := json.Marshal(CommonColorsResp{
-			colors,
-		})
+		resp, err := json.Marshal(colors)
 
 		if err != nil {
 			panic(err)

@@ -10,6 +10,7 @@ import (
 	"github.com/nfnt/resize"
 	"github.com/simonmarton/common-colors/calculator"
 	"github.com/simonmarton/common-colors/color"
+	"github.com/simonmarton/common-colors/server"
 )
 
 // ProcessHandler ...
@@ -18,12 +19,12 @@ type ProcessHandler struct {
 }
 
 // ProcessImage ...
-func (h ProcessHandler) ProcessImage(file io.Reader, imageType string) ([]string, error) {
+func (h ProcessHandler) ProcessImage(file io.Reader, imageType string) (server.CommonColorsResp, error) {
 	fmt.Println("ProcessImage")
 
 	img, err := openImage(file, imageType)
 	if err != nil {
-		return []string{}, err
+		return server.CommonColorsResp{}, err
 	}
 
 	img = resizeImage(img, 64, 64)

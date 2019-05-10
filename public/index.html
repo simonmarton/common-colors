@@ -5,13 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Common Colors</title>
+
+    <style>
+      * {
+        font-family: sans-serif;
+      }
+
+      #result {
+        margin-left: 12px;
+      }
+      #result > div {
+        display: flex;
+        align-items: center;
+
+        transform: scale(0.5);
+        transform-origin: left;
+      }
+
+      #result > div:first-child,
+      #result > div:nth-child(2) {
+        transform: scale(1);
+        margin-bottom: 8px;
+      }
+      #result > div:nth-child(3) {
+        transform: scale(0.9);
+        margin-bottom: 6px;
+      }
+      #result > div:nth-child(4) {
+        transform: scale(0.8);
+        margin-bottom: 2px;
+      }
+      #result > div:nth-child(5) {
+        transform: scale(0.6);
+      }
+
+      #result > .light {
+        opacity: 0.5;
+      }
+
+      #result .color {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+      }
+
+      .show {
+        display: flex;
+        margin: 24px;
+      }
+
+      #preview {
+        width: 420px;
+        height: 420px;
+        object-fit: contain;
+      }
+    </style>
   </head>
   <body>
-    <form id="upload">
-      <input name="image" type="file" />
-      <label for="image">Select iamge to upload</label>
-      <button>Upload</button>
-    </form>
+    <!-- <form id="upload"> -->
+    <input name="image" type="file" />
+    <!-- <button>Upload</button> -->
+    <!-- </form> -->
+
+    <div class="show">
+      <img id="preview" />
+      <div id="result"></div>
+    </div>
 
     <script src="/js/script.js"></script>
   </body>

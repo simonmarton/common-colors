@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"sort"
 )
 
 // Color ...
@@ -78,7 +79,42 @@ func (c Color) Average(c2 Color) Color {
 	}
 }
 
+// Average of a list of colors
+func Average(colors []Color) Color {
+	var sumR, sumG, sumB, sumA, sumWeight int
+
+	for _, c := range colors {
+		sumR += int(c.R) * c.Weight
+		sumG += int(c.G) * c.Weight
+		sumB += int(c.B) * c.Weight
+		sumA += int(c.A) * c.Weight
+		sumWeight += c.Weight
+	}
+
+	return Color{
+		R:      uint8(sumR / sumWeight),
+		G:      uint8(sumG / sumWeight),
+		B:      uint8(sumB / sumWeight),
+		A:      uint8(sumA / sumWeight),
+		Weight: sumWeight,
+	}
+}
+
 // ToHex return a hex color string
 func (c Color) ToHex() string {
 	return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
+}
+
+// Colors ...
+type Colors []Color
+
+func (a Colors) Len() int           { return len(a) }
+func (a Colors) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Colors) Less(i, j int) bool { return a[i].Weight > a[j].Weight }
+
+// Sort ...
+func Sort(colors []Color) (result []Color) {
+	result = colors
+	sort.Sort(Colors(result))
+	return result
 }

@@ -11,6 +11,8 @@ func main() {
 			calculator.Config{
 				IterationCount:       6,
 				TransparencyTreshold: 10,
+				MinLuminance:         .3,
+				MaxLuminance:         .9,
 			},
 		),
 	}
