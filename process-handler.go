@@ -10,6 +10,7 @@ import (
 	"github.com/nfnt/resize"
 	"github.com/simonmarton/common-colors/calculator"
 	"github.com/simonmarton/common-colors/color"
+	"github.com/simonmarton/common-colors/models"
 	"github.com/simonmarton/common-colors/server"
 )
 
@@ -19,8 +20,10 @@ type ProcessHandler struct {
 }
 
 // ProcessImage ...
-func (h ProcessHandler) ProcessImage(file io.Reader, imageType string) (server.CommonColorsResp, error) {
-	fmt.Println("ProcessImage")
+func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig) (server.CommonColorsResp, error) {
+	fmt.Printf("Processing image with config %+v\n", config)
+
+	h.calculator = calculator.New(config)
 
 	img, err := openImage(file, imageType)
 	if err != nil {

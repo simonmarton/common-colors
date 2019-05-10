@@ -67,6 +67,37 @@ func (c Color) Saturation() float64 {
 	return delta / (max + min)
 }
 
+// Hue degree 0-1
+func (c Color) Hue() float64 {
+	r := float64(c.R) / 255
+	g := float64(c.G) / 255
+	b := float64(c.B) / 255
+
+	max := math.Max(r, math.Max(g, b))
+	min := math.Min(r, math.Min(g, b))
+
+	// Achromatic
+	if max == min {
+		return 0
+	}
+
+	delta := max - min
+	var h float64
+	switch max {
+	case r:
+		h = (g - b) / delta
+		if g < b {
+			h += 6
+		}
+	case g:
+		h = (b-r)/delta + 2
+	case b:
+		h = (r-g)/delta + 4
+	}
+
+	return h / 6
+}
+
 // Average of two colors
 func (c Color) Average(c2 Color) Color {
 	sumWeight := c.Weight + c2.Weight
@@ -117,4 +148,34 @@ func Sort(colors []Color) (result []Color) {
 	result = colors
 	sort.Sort(Colors(result))
 	return result
+}
+
+// https://en.wikipedia.org/wiki/YIQ
+
+// Y calculates the brightness compoennt, 0-255
+func (c Color) Y() float64 {
+	return float64(c.R)*0.29889531 + float64(c.G)*0.58662247 + float64(c.B)*0.11448223
+}
+
+// I calculates the one of the chrominance compoennts, 0-255
+func (c Color) I() float64 {
+	return float64(c.R)*0.59597799 - float64(c.G)*0.27417610 - float64(c.B)*0.32180189
+}
+
+// Q calculates the one of the chrominance compoennts, 0-255
+func (c Color) Q() float64 {
+	return float64(c.R)*0.21147017 - float64(c.G)*0.52261711 + float64(c.B)*0.31114694
+}
+
+// YIQDistance from an other color calculatedin in the YIQ color space
+func (c Color) YIQDistance(c2 Color) float64 {
+	y := c.Y() - c2.Y()
+	i := c.I() - c2.I()
+	q := c.Q() - c2.Q()
+
+	// (0.299, 0.596, 0.212);
+	// fmt.Printf("YIQ: %.4f, %.4f,%.4f\n", y, i, q)
+	// fmt.Printf("YIQ: %.4f, %.4f,%.4f\n", c.Y(), c.I(), c.Q())
+
+	return math.Sqrt(math.Pow(y, 2)*0.5053 + math.Pow(i, 2)*0.299 + math.Pow(q, 2)*0.1957)
 }

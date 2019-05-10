@@ -1,11 +1,23 @@
+// Set up config
+document.querySelectorAll('input[type="range"]').forEach(elem => {
+  elem.nextElementSibling.value = elem.value;
+  elem.oninput = e => {
+    e.target.nextElementSibling.value = e.target.value;
+  };
+});
+
+const getConfig = () =>
+  Array.from(document.querySelectorAll('input[type="range"]')).reduce(
+    (config, elem) => ({
+      ...config,
+      [elem.name]: Number(elem.value)
+    }),
+    {}
+  );
 const form = document.querySelector('form#upload');
 const input = document.querySelector('input[type=file]');
 
-// form.addEventListener('submit', evt => {
-input.addEventListener('change', evt => {
-  evt.preventDefault();
-
-  // const { files } = form.querySelector('input[type=file]');
+const upload = () => {
   const { files } = input;
 
   if (!files.length) {
@@ -15,6 +27,7 @@ input.addEventListener('change', evt => {
   const img = files[0];
   const formData = new FormData();
   formData.append('image', img);
+  formData.append('config', JSON.stringify(getConfig()));
 
   const reader = new FileReader();
 
@@ -37,9 +50,8 @@ input.addEventListener('change', evt => {
 
       const total = colors.reduce((total, { weight }) => total + weight, 0);
 
-      colors.forEach(({ value, weight }) => {
+      colors.forEach(({ value, weight, hueDistance }) => {
         const percetage = (weight / total) * 100;
-        console.log({ value, weight, percetage });
 
         const container = document.createElement('div');
         if (percetage < 5) {
@@ -52,16 +64,20 @@ input.addEventListener('change', evt => {
 
         const weightElem = document.createElement('span');
         weightElem.className = 'weight';
-        weightElem.innerText = `${percetage.toFixed(2)}% (${weight})`;
+        weightElem.innerText = `${percetage.toFixed(2)}% (h: ${hueDistance.toFixed(2)}, w: ${weight})`;
 
         container.appendChild(color);
         container.appendChild(weightElem);
 
         result.appendChild(container);
       });
-
-      console.log({ colors });
     });
+};
+
+input.addEventListener('change', evt => {
+  evt.preventDefault();
+
+  upload();
 
   return false;
 });

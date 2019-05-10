@@ -60,13 +60,68 @@
         height: 420px;
         object-fit: contain;
       }
+
+      input[type='file'],
+      button {
+        padding: 12px;
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 8px;
+      }
+
+      /* Config */
+      .config > div {
+        display: flex;
+        align-items: center;
+      }
+      .config > div label {
+        width: 200px;
+        margin-bottom: 12px;
+      }
+
+      input[type='range'] {
+        flex: 0.6;
+      }
     </style>
   </head>
   <body>
-    <!-- <form id="upload"> -->
+    <form class="config">
+      <div>
+        <label for="transparency-treshold">Transparency treshold</label>
+        <input type="range" name="transparencyTreshold" min="0" max="255" step="1" value="10" />
+        <output></output>
+      </div>
+      <div>
+        <label for="iteration-count">Iteration count</label>
+        <input type="range" name="iterationCount" min="2" max="16" step="1" value="6" />
+        <output></output>
+      </div>
+      <div>
+        <label for="min-luminance">Min luminance</label>
+        <input type="range" name="minLuminance" min="0" max="1" step=".05" value=".3" />
+        <output></output>
+      </div>
+      <div>
+        <label for="max-luminance">Max luminance</label>
+        <input type="range" name="maxLuminance" min="0" max="1" step=".05" value=".9" />
+        <output></output>
+      </div>
+      <div>
+        <label>Distance threshold</label>
+        <input type="range" name="distanceThreshold" min="0" max="447" step="1" value="20" />
+        <output></output>
+      </div>
+      <div>
+        <label>Min saturation</label>
+        <input type="range" name="minSaturation" min="0" max="1" step=".05" value=".3" />
+        <output></output>
+      </div>
+    </form>
+
+    <hr />
+
     <input name="image" type="file" />
-    <!-- <button>Upload</button> -->
-    <!-- </form> -->
+    <button id="upload" onclick="upload()">Upload</button>
 
     <div class="show">
       <img id="preview" />
