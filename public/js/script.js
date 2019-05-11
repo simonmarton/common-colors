@@ -12,7 +12,7 @@ const getConfig = () =>
       ...config,
       [elem.name]: Number(elem.value)
     }),
-    {}
+    { algorithm: document.querySelector('select[name="algorithm"]').value }
   );
 const form = document.querySelector('form#upload');
 const input = document.querySelector('input[type=file]');
@@ -27,7 +27,9 @@ const upload = () => {
   const img = files[0];
   const formData = new FormData();
   formData.append('image', img);
-  formData.append('config', JSON.stringify(getConfig()));
+  const config = getConfig();
+  console.log('config', config);
+  formData.append('config', JSON.stringify(config));
 
   const reader = new FileReader();
 

@@ -15,6 +15,7 @@ const defaultMinLuminance float64 = 0
 const defaultMaxLuminance float64 = 1
 const defaultDistanceThreshold float64 = 50
 const defaultMinSaturation float64 = .3
+const defaultAlgorithm string = "simple"
 
 // Calculator can group common colors
 type Calculator struct {
@@ -48,6 +49,10 @@ func New(c models.CalculatorConfig) *Calculator {
 	// 441.67 is the max distance in a cube with 255 long sides
 	if c.DistanceThreshold < 1 || c.DistanceThreshold > 441.67 {
 		c.DistanceThreshold = defaultDistanceThreshold
+	}
+
+	if c.Algorithm == "" {
+		c.Algorithm = defaultAlgorithm
 	}
 
 	return &Calculator{config: c}
@@ -111,8 +116,15 @@ func (c Calculator) groupByThreshold(colors []color.Color, threshold float64) (r
 		remainingColors := []color.Color{}
 
 		for _, color := range colors[1:] {
-			// d := sample.Distance(color)
-			d := sample.YIQDistance(color)
+			var d float64
+			switch c.config.Algorithm {
+			case "simple":
+				d = sample.Distance(color)
+			case "yiq":
+				d = sample.YIQDistance(color)
+			default:
+				panic("Not supported Algorithm")
+			}
 
 			if d < threshold {
 				similarColors = append(similarColors, color)

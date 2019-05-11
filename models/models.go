@@ -8,4 +8,5 @@ type CalculatorConfig struct {
 	MaxLuminance         float64 `json:"maxLuminance"`
 	DistanceThreshold    float64 `json:"distanceThreshold"`
 	MinSaturation        float64 `json:"minSaturation"`
+	Algorithm            string  `json:"algorithm"`
 }
