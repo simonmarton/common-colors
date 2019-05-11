@@ -11,15 +11,24 @@
         font-family: sans-serif;
       }
 
+      .top {
+        display: flex;
+      }
+
       #result {
         margin-left: 12px;
       }
+
       #result > div {
         display: flex;
         align-items: center;
 
         transform: scale(0.5);
         transform-origin: left;
+      }
+
+      #result.hide-overflow > div:nth-child(n + 5) {
+        display: none;
       }
 
       #result > div:first-child,
@@ -50,15 +59,21 @@
         margin-right: 8px;
       }
 
+      .upload-stuff {
+        width: 350px;
+        margin-right: 12px;
+      }
+
       .show {
         display: flex;
-        margin: 24px;
+        margin: 12px 0;
       }
 
       #preview {
-        width: 420px;
-        height: 420px;
+        width: 120px;
+        height: 120px;
         object-fit: contain;
+        border: 1px solid #aaa;
       }
 
       input[type='file'],
@@ -70,6 +85,9 @@
       }
 
       /* Config */
+      .config {
+        flex: 1;
+      }
       .config > div {
         display: flex;
         align-items: center;
@@ -85,48 +103,58 @@
     </style>
   </head>
   <body>
-    <form class="config">
-      <div>
-        <label for="transparency-treshold">Transparency treshold</label>
-        <input type="range" name="transparencyTreshold" min="0" max="255" step="1" value="10" />
-        <output></output>
+    <div class="top">
+      <div class="upload-stuff">
+        <input name="image" type="file" />
+        <button id="upload" onclick="upload()">Upload</button>
+
+        <div class="show">
+          <img id="preview" />
+          <div class="hide-overflow" id="result"></div>
+        </div>
       </div>
-      <div>
-        <label for="iteration-count">Iteration count</label>
-        <input type="range" name="iterationCount" min="2" max="16" step="1" value="6" />
-        <output></output>
-      </div>
-      <div>
-        <label for="min-luminance">Min luminance</label>
-        <input type="range" name="minLuminance" min="0" max="1" step=".05" value=".3" />
-        <output></output>
-      </div>
-      <div>
-        <label for="max-luminance">Max luminance</label>
-        <input type="range" name="maxLuminance" min="0" max="1" step=".05" value=".9" />
-        <output></output>
-      </div>
-      <div>
-        <label>Distance threshold</label>
-        <input type="range" name="distanceThreshold" min="0" max="447" step="1" value="20" />
-        <output></output>
-      </div>
-      <div>
-        <label>Min saturation</label>
-        <input type="range" name="minSaturation" min="0" max="1" step=".05" value=".3" />
-        <output></output>
-      </div>
-    </form>
+      <form class="config">
+        <div>
+          <label for="transparency-treshold">Transparency treshold</label>
+          <input type="range" name="transparencyTreshold" min="0" max="255" step="1" value="10" />
+          <output></output>
+        </div>
+        <div>
+          <label for="iteration-count">Iteration count</label>
+          <input type="range" name="iterationCount" min="2" max="8" step="1" value="3" />
+          <output></output>
+        </div>
+        <div>
+          <label for="min-luminance">Min luminance</label>
+          <input type="range" name="minLuminance" min="0" max="1" step=".05" value=".3" />
+          <output></output>
+        </div>
+        <div>
+          <label for="max-luminance">Max luminance</label>
+          <input type="range" name="maxLuminance" min="0" max="1" step=".05" value=".9" />
+          <output></output>
+        </div>
+        <div>
+          <label>Distance threshold</label>
+          <input type="range" name="distanceThreshold" min="0" max="80" step="5" value="20" />
+          <output></output>
+        </div>
+        <div>
+          <label>Min saturation</label>
+          <input type="range" name="minSaturation" min="0" max="1" step=".05" value=".3" />
+          <output></output>
+        </div>
+        <div>
+          <label>Distance algorithm</label>
+          <select name="algorithm">
+            <option value="simple">Simple</option>
+            <option value="yiq" selected>YIQ</option>
+          </select>
+        </div>
+      </form>
+    </div>
 
     <hr />
-
-    <input name="image" type="file" />
-    <button id="upload" onclick="upload()">Upload</button>
-
-    <div class="show">
-      <img id="preview" />
-      <div id="result"></div>
-    </div>
 
     <script src="/js/script.js"></script>
   </body>
