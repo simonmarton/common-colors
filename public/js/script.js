@@ -14,6 +14,13 @@ const getConfig = () =>
     }),
     { algorithm: document.querySelector('select[name="algorithm"]').value }
   );
+
+const setGradientColors = (c1, c2) => {
+  console.log('setting gradient colors', c1, c2);
+  document.getElementById('main-color-1').setAttribute('stop-color', c1.value);
+  document.getElementById('main-color-2').setAttribute('stop-color', c2.value);
+};
+
 const form = document.querySelector('form#upload');
 const input = document.querySelector('input[type=file]');
 
@@ -35,6 +42,7 @@ const upload = () => {
 
   reader.onload = e => {
     document.querySelector('#preview').setAttribute('src', e.target.result);
+    document.querySelector('#icon').setAttribute('src', e.target.result);
   };
 
   reader.readAsDataURL(img);
@@ -49,6 +57,10 @@ const upload = () => {
       result.innerHTML = '';
 
       colors = colors || [];
+
+      if (colors.length >= 2) {
+        setGradientColors(...colors);
+      }
 
       const total = colors.reduce((total, { weight }) => total + weight, 0);
 
