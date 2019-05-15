@@ -116,6 +116,10 @@
         border-radius: 24px;
         object-fit: contain;
       }
+
+      img[src=''] {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -187,21 +191,28 @@
 
           <!-- Main bg right to left -->
           <linearGradient id="header-bg-main" x1="100%" x2="0%" y1="50%" y2="50%">
-            <stop offset="0%" stop-color="#0DD3C5" id="main-color-1" />
-            <stop offset="100%" stop-color="#0D83CD" id="main-color-2" />
+            <!-- <stop offset="0%" stop-color="#0DD3C5" id="main-color-1" />
+            <stop offset="100%" stop-color="#0D83CD" id="main-color-2" /> -->
+            <stop offset="0%" stop-color="transparent" id="main-color-2" />
+            <stop offset="100%" stop-color="transparent" id="main-color-1" />
           </linearGradient>
 
           <!-- Bottom shape, right to left -->
           <linearGradient id="header-bg-bottom" x1="96.609%" x2="14.073%" y1="48.146%" y2="53.257%">
-            <stop offset="0%" stop-color="#0FF" stop-opacity=".2155" />
+            <!-- <stop offset="0%" stop-color="#0FF" stop-opacity=".2155" />
             <stop offset="64.655%" stop-color="#9FFFFC" stop-opacity=".2155" />
-            <stop offset="100%" stop-color="#D0FEFF" stop-opacity="0" />
+            <stop offset="100%" stop-color="#D0FEFF" stop-opacity="0" /> -->
+            <stop offset="0%" stop-color="#fff" stop-opacity=".2155" />
+            <stop offset="64.655%" stop-color="#fff" stop-opacity=".2155" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
           </linearGradient>
 
           <!-- Right shape, right to left -->
           <linearGradient id="header-bg-right" x1="114.011%" x2="-19.114%" y1="49.716%" y2="49.864%">
-            <stop offset="0%" stop-color="#D2FFFE" stop-opacity=".577" />
-            <stop offset="100%" stop-color="#D0FEFF" stop-opacity="0" />
+            <!-- <stop offset="0%" stop-color="#D2FFFE" stop-opacity=".577" />
+            <stop offset="100%" stop-color="#D0FEFF" stop-opacity="0" /> -->
+            <stop offset="0%" stop-color="#fff" stop-opacity=".577" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
           </linearGradient>
         </defs>
         <g fill="none" fill-rule="evenodd">
@@ -224,7 +235,7 @@
           </g>
         </g>
       </svg>
-      <img id="icon" />
+      <img id="icon" src="" />
     </header>
 
     <script src="/js/script.js"></script>

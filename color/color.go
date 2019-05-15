@@ -22,6 +22,63 @@ func NewFromRGBA(c color.Color) Color {
 	return Color{rgba.R, rgba.G, rgba.B, rgba.A, 1}
 }
 
+func hue2RGB(p, q, t float64) float64 {
+	if t < 0 {
+		t++
+	}
+
+	if t > 1 {
+		t--
+	}
+
+	if t < 1/6. {
+		return p + (q-p)*6*t
+	}
+
+	if t < 1/2. {
+		return q
+	}
+
+	if t < 2/3. {
+		return p + (q-p)*(2/3.-t)*6
+	}
+
+	return p
+}
+
+// NewFromHSL creates a color from h,s,l values, inputs should be between 0-1
+func NewFromHSL(h, s, l float64) (c Color) {
+	if s == 0 {
+		// Achromatic
+		v := uint8(l * 255)
+		return Color{
+			R: v,
+			G: v,
+			B: v,
+			A: 255,
+		}
+	}
+
+	var q float64
+	if l < .5 {
+		q = l * (1 + s)
+	} else {
+		q = l + s - l*s
+	}
+	p := 2*l - q
+
+	r := hue2RGB(p, q, h+1/3.)
+	g := hue2RGB(p, q, h)
+	b := hue2RGB(p, q, h-1/3.)
+
+	return Color{
+		R: uint8(math.Round(r * 255)),
+		G: uint8(math.Round(g * 255)),
+		B: uint8(math.Round(b * 255)),
+		A: 255,
+	}
+}
+
 // Distance from an other color
 func (c Color) Distance(c2 Color) float64 {
 	return math.Sqrt(
@@ -44,45 +101,27 @@ func (c Color) Luminance() float64 {
 
 // Saturation calculates colorfulness on a scale of 0-1
 func (c Color) Saturation() float64 {
-	r := float64(c.R) / 255
-	g := float64(c.G) / 255
-	b := float64(c.B) / 255
-
-	max := math.Max(r, math.Max(g, b))
-	min := math.Min(r, math.Min(g, b))
-
-	avg := (max + min) / 2
-
-	// Achromatic
-	if max == min {
-		return 0
-	}
-
-	delta := max - min
-
-	if avg > .5 {
-		return delta / (2 - max - min)
-	}
-
-	return delta / (max + min)
+	_, s, _, _ := c.ToHSLA()
+	return s
 }
 
-// Hue degree 0-1
-func (c Color) Hue() float64 {
+// ToHSLA Convert to HSLA color space
+func (c Color) ToHSLA() (h, s, l, a float64) {
 	r := float64(c.R) / 255
 	g := float64(c.G) / 255
 	b := float64(c.B) / 255
+	a = float64(c.A) / 255
 
 	max := math.Max(r, math.Max(g, b))
 	min := math.Min(r, math.Min(g, b))
+	l = (max + min) / 2
 
 	// Achromatic
 	if max == min {
-		return 0
+		return 0, 0, l, a
 	}
 
 	delta := max - min
-	var h float64
 	switch max {
 	case r:
 		h = (g - b) / delta
@@ -95,7 +134,19 @@ func (c Color) Hue() float64 {
 		h = (r-g)/delta + 4
 	}
 
-	return h / 6
+	if l > .5 {
+		s = delta / (2 - max - min)
+	} else {
+		s = delta / (max + min)
+	}
+
+	return h / 6, s, l, a
+}
+
+// Hue degree 0-1
+func (c Color) Hue() float64 {
+	h, _, _, _ := c.ToHSLA()
+	return h
 }
 
 // Average of two colors

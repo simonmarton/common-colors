@@ -11,7 +11,8 @@ import (
 
 // CommonColorsResp format
 type CommonColorsResp struct {
-	Colors []ColorResp `json:"colors"`
+	Colors   []ColorResp `json:"colors"`
+	Gradient []string    `json:"gradient"`
 }
 
 // ColorResp ...

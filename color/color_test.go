@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+func inTolerance(t *testing.T, expected, actual, tolerance float64) {
+	if math.Abs(expected-actual) > tolerance {
+		t.Errorf("inTolerance error, expected %.4f, got %.4f", expected, actual)
+	}
+}
+
 func TestColort(t *testing.T) {
 	var colorTests = []struct {
 		c   Color
@@ -73,10 +79,47 @@ func TestYIQDistance(t *testing.T) {
 
 	// d := c1.YIQDistance(c3)
 	d := w.YIQDistance(b)
-	expected := 123.0
+	expected := 102.03
+	tolerance := .001
 
 	// if math.Abs(tt.lum-l) > tolerance {
-	if d != expected {
+	if math.Abs(d-expected) > tolerance {
 		t.Errorf("YIQDistance error, expected %.4f, got %.4f", expected, d)
 	}
 }
+
+func TestToHSLA(t *testing.T) {
+	original := Color{R: 123, G: 183, B: 23, A: 128}
+
+	h, s, l, a := original.ToHSLA()
+
+	inTolerance(t, h, .23, .01)
+	inTolerance(t, s, .78, .01)
+	inTolerance(t, l, .4, .01)
+	inTolerance(t, a, .5, .01)
+}
+
+func TestNewFromHSL(t *testing.T) {
+	original := Color{R: 123, G: 183, B: 23, A: 255}
+
+	h, s, l, _ := original.ToHSLA()
+
+	inTolerance(t, 0.23, h, .01)
+	inTolerance(t, 0.78, s, .01)
+	inTolerance(t, 0.40, l, .01)
+
+	if NewFromHSL(h, s, l) != original {
+		t.Error("NewFromHSL original and calculated did not match")
+	}
+}
+
+func TestHue2RGB(t *testing.T) {
+	p := .09
+	q := .7
+	h := .4
+
+	x := hue2RGB(p, q, h-1/3.)
+	t.Errorf("NewFromHSL error %.4f", x)
+}
+
+//

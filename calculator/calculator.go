@@ -1,12 +1,10 @@
 package calculator
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/simonmarton/common-colors/color"
 	"github.com/simonmarton/common-colors/models"
-	"github.com/simonmarton/common-colors/server"
 )
 
 const defaultTransparencyTreshold uint8 = 10
@@ -59,34 +57,63 @@ func New(c models.CalculatorConfig) *Calculator {
 }
 
 // GetCommonColors ...
-func (c Calculator) GetCommonColors(colors []color.Color) (result server.CommonColorsResp) {
-	// log.Printf("GetCommonColors len: %d", len(colors))
-
+func (c Calculator) GetCommonColors(colors []color.Color) []color.Color {
 	colors = c.removeInvalidColors(colors)
-	// log.Printf("GetCommonColors 2 len: %d", len(colors))
 
 	for i := int8(0); i < c.config.IterationCount; i++ {
-		// colors = c.groupByNearestNeighbor(colors)
-
 		threshold := c.config.DistanceThreshold*float64(i)/float64(c.config.IterationCount-1) + 10
-
-		// log.Printf("GetCommonColors i: %d len: %d, threshold: %.4f", i, len(colors), threshold)
 		colors = c.groupByThreshold(colors, threshold)
 	}
 
 	color.Sort(colors)
 
-	mainColor := colors[0]
+	return colors
+}
 
-	for _, c := range colors {
-		result.Colors = append(result.Colors, server.ColorResp{
-			Value:       c.ToHex(),
-			Weight:      c.Weight,
-			HueDistance: math.Abs(mainColor.Hue() - c.Hue()),
-		})
+// GenrateGradientColors ...
+func (c Calculator) GenrateGradientColors(colors []color.Color) (result []string) {
+	totalWeight := 0
+
+	for _, col := range colors {
+		totalWeight += col.Weight
 	}
 
-	return result
+	mainColor := colors[0]
+	var secondaryColor string
+
+	if len(colors) >= 2 {
+		mp := float64(mainColor.Weight) / float64(totalWeight)
+		for _, col := range colors[1:] {
+			p := float64(col.Weight) / float64(totalWeight)
+
+			// Too big weight diff compared to the main color, ignore
+			// if mp-p > .4 {
+			if mp/p > 2.5 {
+				break
+			}
+
+			// Colors have similar hue, diff is less than 45deg
+			hd := math.Abs(mainColor.Hue() - col.Hue())
+
+			if hd < .125 {
+				secondaryColor = col.ToHex()
+				break
+			}
+		}
+	}
+
+	if secondaryColor == "" {
+		// Calculate from main color
+		h, s, l, _ := mainColor.ToHSLA()
+
+		// Rotate 10deg
+		h += .025 // TODO config
+		s = math.Max(c.config.MinSaturation, s-.2)
+
+		secondaryColor = color.NewFromHSL(h, s, l).ToHex()
+	}
+
+	return []string{mainColor.ToHex(), secondaryColor}
 }
 
 func (c Calculator) removeInvalidColors(colors []color.Color) (result []color.Color) {
@@ -166,7 +193,6 @@ func (c Calculator) groupByNearestNeighbor(colors []color.Color) (result []color
 	}
 
 	if len(colors) > 0 {
-		fmt.Println("groupByNearestNeighbor colors remained")
 		result = append(result, colors...)
 	}
 

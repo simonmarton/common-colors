@@ -17,8 +17,8 @@ const getConfig = () =>
 
 const setGradientColors = (c1, c2) => {
   console.log('setting gradient colors', c1, c2);
-  document.getElementById('main-color-1').setAttribute('stop-color', c1.value);
-  document.getElementById('main-color-2').setAttribute('stop-color', c2.value);
+  document.getElementById('main-color-1').setAttribute('stop-color', c1);
+  document.getElementById('main-color-2').setAttribute('stop-color', c2);
 };
 
 const form = document.querySelector('form#upload');
@@ -52,15 +52,14 @@ const upload = () => {
     body: formData
   })
     .then(res => res.json())
-    .then(({ colors } = {}) => {
+    .then(({ colors, gradient } = {}) => {
       const result = document.querySelector('#result');
       result.innerHTML = '';
 
       colors = colors || [];
+      gradient = gradient || [];
 
-      if (colors.length >= 2) {
-        setGradientColors(...colors);
-      }
+      setGradientColors(...gradient);
 
       const total = colors.reduce((total, { weight }) => total + weight, 0);
 

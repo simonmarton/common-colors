@@ -6,6 +6,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"math"
 
 	"github.com/nfnt/resize"
 	"github.com/simonmarton/common-colors/calculator"
@@ -20,7 +21,7 @@ type ProcessHandler struct {
 }
 
 // ProcessImage ...
-func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig) (server.CommonColorsResp, error) {
+func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig) (result server.CommonColorsResp, err error) {
 	fmt.Printf("Processing image with config %+v\n", config)
 
 	h.calculator = calculator.New(config)
@@ -33,7 +34,19 @@ func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config mo
 	img = resizeImage(img, 64, 64)
 	colors := colorsFromImage(img)
 
-	return h.calculator.GetCommonColors(colors), nil
+	colors = h.calculator.GetCommonColors(colors)
+	mainColor := colors[0]
+	for _, c := range colors {
+		result.Colors = append(result.Colors, server.ColorResp{
+			Value:       c.ToHex(),
+			Weight:      c.Weight,
+			HueDistance: math.Abs(mainColor.Hue() - c.Hue()),
+		})
+	}
+
+	result.Gradient = h.calculator.GenrateGradientColors(colors)
+
+	return result, nil
 }
 
 func resizeImage(img image.Image, width, height int) image.Image {
