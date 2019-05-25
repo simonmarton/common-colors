@@ -21,7 +21,7 @@ type ProcessHandler struct {
 }
 
 // ProcessImage ...
-func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig) (result server.CommonColorsResp, err error) {
+func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig, withSteps bool) (result server.CommonColorsResp, err error) {
 	fmt.Printf("Processing image with config %+v\n", config)
 
 	h.calculator = calculator.New(config)
@@ -34,7 +34,7 @@ func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config mo
 	img = resizeImage(img, 64, 64)
 	colors := colorsFromImage(img)
 
-	colors = h.calculator.GetCommonColors(colors)
+	colors, steps := h.calculator.GetCommonColors(colors)
 	mainColor := colors[0]
 	for _, c := range colors {
 		result.Colors = append(result.Colors, server.ColorResp{
@@ -42,6 +42,24 @@ func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config mo
 			Weight:      c.Weight,
 			HueDistance: math.Abs(mainColor.Hue() - c.Hue()),
 		})
+	}
+
+	if withSteps {
+		var stepsOfColors [][]server.ColorStepResp
+		for _, cs := range steps {
+			r := []server.ColorStepResp{}
+			for _, c := range cs {
+				r = append(r, server.ColorStepResp{
+					R:      c.R,
+					G:      c.G,
+					B:      c.B,
+					Weight: c.Weight,
+				})
+			}
+			stepsOfColors = append(stepsOfColors, r)
+		}
+
+		result.StepsOfColors = &stepsOfColors
 	}
 
 	result.Gradient = h.calculator.GenrateGradientColors(colors)

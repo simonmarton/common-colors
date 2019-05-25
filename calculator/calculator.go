@@ -57,17 +57,20 @@ func New(c models.CalculatorConfig) *Calculator {
 }
 
 // GetCommonColors ...
-func (c Calculator) GetCommonColors(colors []color.Color) []color.Color {
+func (c Calculator) GetCommonColors(colors []color.Color) ([]color.Color, [][]color.Color) {
 	colors = c.removeInvalidColors(colors)
+	stepsOfColors := [][]color.Color{}
 
 	for i := int8(0); i < c.config.IterationCount; i++ {
 		threshold := c.config.DistanceThreshold*float64(i)/float64(c.config.IterationCount-1) + 10
 		colors = c.groupByThreshold(colors, threshold)
+
+		stepsOfColors = append(stepsOfColors, color.Sort(colors))
 	}
 
 	color.Sort(colors)
 
-	return colors
+	return colors, stepsOfColors
 }
 
 // GenrateGradientColors ...

@@ -11,8 +11,9 @@ import (
 
 // CommonColorsResp format
 type CommonColorsResp struct {
-	Colors   []ColorResp `json:"colors"`
-	Gradient []string    `json:"gradient"`
+	Colors        []ColorResp        `json:"colors"`
+	Gradient      []string           `json:"gradient"`
+	StepsOfColors *[][]ColorStepResp `json:"steps"`
 }
 
 // ColorResp ...
@@ -22,10 +23,18 @@ type ColorResp struct {
 	HueDistance float64 `json:"hueDistance"`
 }
 
+// ColorStepResp ...
+type ColorStepResp struct {
+	R      uint8 `json:"r"`
+	G      uint8 `json:"g"`
+	B      uint8 `json:"b"`
+	Weight int   `json:"weight"`
+}
+
 // APIHandler interface
 type APIHandler interface {
 	// GetCommonColors(io.Reader) CommonColorsResp
-	ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig) (CommonColorsResp, error)
+	ProcessImage(file io.Reader, imageType string, config models.CalculatorConfig, withSteps bool) (CommonColorsResp, error)
 }
 
 // Initialize a new web server
@@ -45,7 +54,9 @@ func Initialize(h APIHandler) {
 			panic(err)
 		}
 
-		colors, err := h.ProcessImage(file, header.Header.Get("Content-Type"), config)
+		_, withSteps := r.URL.Query()["steps"]
+
+		colors, err := h.ProcessImage(file, header.Header.Get("Content-Type"), config, withSteps)
 		if err != nil {
 			panic(err)
 		}
