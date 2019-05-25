@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Chart</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .ui {
+        position: absolute;
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .ui-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      input {
+        width: 30vw;
+        min-width: 100px;
+        max-width: 160px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      #preview {
+        width: 30vw;
+        height: 30vw;
+        min-height: 100px;
+        min-width: 100px;
+        max-height: 160px;
+        max-width: 160px;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ui">
+      <div class="ui-content">
+        <input type="file" />
+        <button id="next" disabled>next</button>
+
+        <img id="preview" />
+      </div>
+    </div>
+    <script src="/js/lib/three.min.js"></script>
+    <script src="/js/lib/OrbitControls.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/chart.js"></script>
+  </body>
+</html>

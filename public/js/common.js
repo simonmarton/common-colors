@@ -21,24 +21,25 @@ const appendUploadButton = (afterUpload = () => {}, getConfig = () => {}, withSt
 };
 
 // eslint-disable-next-line no-unused-vars
-const uploadImage = async (image, config, withSteps) => {
+const uploadImage = async (image, config = {}, withSteps) => {
   if (!image) {
     throw new Error('Select an image');
   }
 
-  if (!config) {
-    console.log('Using default config');
+  const defaultConfig = {
+    algorithm: 'yiq',
+    transparencyTreshold: 10,
+    iterationCount: 3,
+    minLuminance: 0.3,
+    maxLuminance: 0.9,
+    distanceThreshold: 20,
+    minSaturation: 0.3
+  };
 
-    config = {
-      algorithm: 'yiq',
-      transparencyTreshold: 10,
-      iterationCount: 3,
-      minLuminance: 0.3,
-      maxLuminance: 0.9,
-      distanceThreshold: 20,
-      minSaturation: 0.3
-    };
-  }
+  config = {
+    ...defaultConfig,
+    ...config
+  };
 
   const formData = new FormData();
   formData.append('image', image);
