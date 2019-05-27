@@ -2,29 +2,40 @@
 
 const v3 = (...args) => new THREE.Vector3(...args);
 
+let x = 0;
+
 class Point {
-  constructor(position, radius, color) {
-    // this.birth = Date.now();
-    this.growTimeout = Date.now() + Math.random() * 500;
-    this.scale = 0.01;
-    this.geometry = new THREE.SphereGeometry(radius, 32, 32);
+  constructor(position, radius, color, animate) {
+    this.animate = animate;
+    if (this.animate) {
+      this.growTimeout = Date.now() + Math.random() * 500;
+      this.scale = 0.01;
+    }
+
+    // this.geometry = new THREE.SphereGeometry(radius, 32, 32);
+    this.geometry = new THREE.SphereGeometry(radius, 12, 12);
 
     // this.material = new THREE.MeshBasicMaterial({ color });
     this.material = new THREE.MeshPhongMaterial({ color, shininess: 5 });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
-    this.mesh.scale.set(v3(this.scale));
+    animate && this.mesh.scale.set(v3(this.scale));
 
     this.mesh.position.set(position.x, position.y, position.z);
   }
 
-  static FromColor({ r, g, b, weight }) {
+  static FromColor({ r, g, b, weight }, animate) {
     const w = Math.min(Math.max(5, weight / 20), 50);
-    return new Point(new THREE.Vector3(r, g, b), w, `rgb(${r}, ${g}, ${b})`);
+
+    // if (x++ < 10) {
+    //   console.log({ w, animate });
+    // }
+
+    return new Point(new THREE.Vector3(r, g, b), w, `rgb(${r}, ${g}, ${b})`, animate);
   }
 
   update() {
-    if (this.scale < 1 && this.growTimeout < Date.now()) {
+    if (this.animate && this.scale < 1 && this.growTimeout < Date.now()) {
       this.scale += 0.05;
       const scale = this.scale * (2 - this.scale);
 
@@ -72,17 +83,6 @@ class Application {
     this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 2000);
     this.camera.position.set(500, 450, 450);
 
-    this.controls = new THREE.OrbitControls(this.camera);
-    this.controls.target.set(128, 128, 128);
-    this.controls.enableZoom = false;
-    this.controls.minDistance = 800;
-    this.controls.maxDistance = 800;
-
-    this.controls.update();
-    this.controls.autoRotate = true;
-    this.controls.autoRotate = true;
-    this.controls.autoRotateSpeed = 1.5;
-
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -103,9 +103,34 @@ class Application {
     this.scene.add(directionalLight);
     this.scene.add(new THREE.AmbientLight('#aaa'));
 
+    this.setupControls();
     this.createAxis();
 
     this.render();
+  }
+
+  setupControls() {
+    this.controls = new THREE.OrbitControls(this.camera);
+    this.controls.target.set(128, 128, 128);
+    this.controls.enableZoom = false;
+    this.controls.minDistance = 800;
+    this.controls.maxDistance = 800;
+
+    this.controls.autoRotate = true;
+    // this.controls.autoRotateSpeed = 1.5;
+
+    this.controls.addEventListener('start', () => {
+      clearTimeout(this.autorotateTimeout);
+      this.controls.autoRotate = false;
+    });
+
+    this.controls.addEventListener('end', () => {
+      this.autorotateTimeout = setTimeout(() => {
+        this.controls.autoRotate = true;
+      }, 3000);
+    });
+
+    this.controls.update();
   }
 
   createAxis() {
@@ -154,13 +179,28 @@ class Application {
     this.scene.add(mesh.getMesh());
   }
 
+  // Meh, and does not work with update
+  addBulk(objects) {
+    const group = new THREE.Group();
+    objects.forEach(o => {
+      this.objects.push(o);
+      group.add(o.getMesh());
+    });
+
+    this.scene.add(group);
+  }
+
   clear() {
-    this.objects.forEach(obj => {
+    for (let i = 0; i < this.objects.length; i++) {
+      const obj = this.objects[i];
+
       const mesh = obj.getMesh();
       this.scene.remove(mesh);
       mesh.geometry.dispose();
       mesh.material.dispose();
-    });
+
+      this.objects[i] = null;
+    }
 
     this.objects = [];
   }
@@ -195,20 +235,33 @@ const process = () => {
     return;
   }
 
+  console.time('process');
+
   next.innerText = `next ${stepIdx + 1} / ${allSteps.length}`;
 
   app.clear();
 
+  const mem = performance.memory.usedJSHeapSize / 1024 / 1024;
+  if (mem > 1000) {
+    console.warn('memory', mem);
+  }
+  const isSetupStep = stepIdx < 2;
+
   const step = allSteps[stepIdx++];
 
-  step.forEach(point => {
-    if (point.weight < 5) return;
-    app.add(Point.FromColor(point));
+  const points = step.filter(({ weight }) => isSetupStep || weight >= 5);
+
+  points.forEach(point => {
+    app.add(Point.FromColor(point, !isSetupStep));
   });
+
+  // app.addBulk(points.map(point => Point.FromColor(point, !isSetupStep)));
 
   if (stepIdx === allSteps.length) {
     next.setAttribute('disabled', true);
   }
+
+  console.timeEnd('process');
 };
 
 document.getElementById('next').onclick = () => {

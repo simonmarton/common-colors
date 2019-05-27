@@ -31,7 +31,8 @@ func (h ProcessHandler) ProcessImage(file io.Reader, imageType string, config mo
 		return server.CommonColorsResp{}, err
 	}
 
-	img = resizeImage(img, 64, 64)
+	// img = resizeImage(img, 64, 64)
+	img = resizeImage(img, 32, 32)
 	colors := colorsFromImage(img)
 
 	colors, steps := h.calculator.GetCommonColors(colors)

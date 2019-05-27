@@ -1,6 +1,7 @@
 package calculator
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/simonmarton/common-colors/color"
@@ -58,8 +59,13 @@ func New(c models.CalculatorConfig) *Calculator {
 
 // GetCommonColors ...
 func (c Calculator) GetCommonColors(colors []color.Color) ([]color.Color, [][]color.Color) {
+	fmt.Printf("Colors length: %d\n", len(colors))
+	stepsOfColors := [][]color.Color{colors}
+
 	colors = c.removeInvalidColors(colors)
-	stepsOfColors := [][]color.Color{}
+	fmt.Printf("Colors length after: %d\n", len(colors))
+
+	stepsOfColors = append(stepsOfColors, colors)
 
 	for i := int8(0); i < c.config.IterationCount; i++ {
 		threshold := c.config.DistanceThreshold*float64(i)/float64(c.config.IterationCount-1) + 10
