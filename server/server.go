@@ -68,6 +68,7 @@ func Initialize(h APIHandler) {
 			panic(err)
 		}
 
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Write(resp)
 	})
 
