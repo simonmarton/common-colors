@@ -21,9 +21,7 @@ const setGradientColors = (c1, c2) => {
   document.getElementById('main-color-2').setAttribute('stop-color', c2);
 };
 
-const form = document.querySelector('form#upload');
-
-appendUploadButton(({ colors, gradient }) => {
+const handleResult = ({ colors, gradient }) => {
   const result = document.querySelector('#result');
   result.innerHTML = '';
 
@@ -55,4 +53,16 @@ appendUploadButton(({ colors, gradient }) => {
 
     result.appendChild(container);
   });
-}, getConfig);
+};
+
+document.getElementById('upload').addEventListener('click', () => {
+  let input = document.querySelector('input[type=file]');
+
+  const {
+    files: [image]
+  } = input;
+
+  uploadImage(image, getConfig()).then(handleResult);
+});
+
+appendUploadButton(handleResult, getConfig);
