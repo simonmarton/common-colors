@@ -51,40 +51,6 @@ func FromURL(url string) ([]string, error) {
 	return calculator.GenrateGradientColors(commonColors), nil
 }
 
-// FromImg ...
-func FromImg(img image.Image) ([]string, error) {
-	calculator := calculator.New(models.CalculatorConfig{
-		Algorithm:            "yiq",
-		TransparencyTreshold: 10,
-		IterationCount:       3,
-		MinLuminance:         0.3,
-		MaxLuminance:         0.9,
-		DistanceThreshold:    20,
-		MinSaturation:        0.3,
-	})
-
-	// client := httpClient()
-
-	// resp, err := client.Get(url)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// Content-Type is broken currently on Bitrise
-	// openImage(resp.Body, resp.Header.Get("Content-Type"))
-
-	// img, err := openImage(resp.Body, path.Ext(url))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	img = resizeImage(img, 32, 32)
-	colors := colorsFromImage(img)
-
-	commonColors, _ := calculator.GetCommonColors(colors)
-	return calculator.GenrateGradientColors(commonColors), nil
-}
-
 func httpClient() *http.Client {
 	client := http.Client{
 		CheckRedirect: func(r *http.Request, via []*http.Request) error {
